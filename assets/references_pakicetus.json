@@ -1,0 +1,35 @@
+[
+  {
+    "id": "Wade_1998",
+    "type": "article-journal",
+    "title": "Calculating limits to the allowable human-caused mortality of cetaceans and pinnipeds",
+    "author": [
+      {
+        "family": "Wade",
+        "given": "Paul R."
+      }
+    ],
+    "container-title": "Marine Mammal Science",
+    "volume": "14",
+    "issue": "1",
+    "page": "1-37",
+    "issued": {
+      "date-parts": [[1998]]
+    }
+  },
+  {
+    "id": "NMFS_2023",
+    "type": "report",
+    "title": "Guidelines for preparing stock assessment reports pursuant to the Marine Mammal Protection Act",
+    "author": [
+      {
+        "literal": "National Marine Fisheries Service"
+      }
+    ],
+    "publisher": "U.S. Department of Commerce",
+    "genre": "NOAA Technical Memorandum",
+    "issued": {
+      "date-parts": [[2023]]
+    }
+  }
+]

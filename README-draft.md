@@ -35,7 +35,7 @@ Rendering the template produces a formatted SAR PDF that includes:
 
 - A NOAA Fisheries cover page and running headers populated by the YAML header
 - Automatic line numbering for review drafts
-- Citations and a reference list generated from a shared `.bib` file
+- Citations and a reference list generated from a CSL JSON reference file
 - Numbered figures and tables referenced by label (`@fig-`, `@tbl-`)
 - Values from N<sub>min</sub>, PBR calculated from the stock data file following GAMMS section 3.2 and strategic-status calculations derived from your data, not typed in by hand
 - An optional HTML preview for iteration while drafting
@@ -103,7 +103,7 @@ quarto render
 
 The first render is slower while R caches packages. Output is written to \[OUTPUT DIR\]. Open the PDF and confirm the cover page, line numbering, and reference list all resolve.
 
-**4. Start writing.** See [Writing your SAR](#writing-your-sar) below.
+**5. Start writing.** See [Writing your SAR](#writing-your-sar) below.
 
 ------------------------------------------------------------------------
 
@@ -263,14 +263,14 @@ As shown in @fig-range, sightings concentrate ...
 
 `fig-cap` supplies the printed caption. `fig-alt` supplies the description read by screen readers and is required for Section 508 compliance. See [Accessibility](#accessibility).
 
-### 6. Add citations (need testing and checking)
+### 6. Add citations
 
 Two files in `assets/` control citations:
 
-| File | Purpose | Do you edit it? |
-|----|----|----|
-| `references_pakicetus.json` | Holds the reference entries | Yes |
-| `apa.csl` | Defines how citations are formatted | No |
+| File                        | Purpose                               |
+|-----------------------------|---------------------------------------|
+| `references_pakicetus.json` | Reference entries, in CSL JSON format |
+| `apa.csl`                   | Citation style. Do not edit           |
 
 Your stock's `.qmd` header points at the first of these:
 
@@ -280,7 +280,19 @@ bibliography: ../assets/references_your-stock.json
 
 Copy `references_pakicetus.json`, rename it for your stock, and add entries.
 
-#### The reference file
+#### Building the reference file
+
+<!-- Details regarding usage of Zotero needs to be checked by authors/editors. -->
+
+Zotero with the Better BibTeX plugin is the recommended workflow. Right-click the collection, choose Export Collection, and select CSL JSON. Check "Keep updated" so Zotero rewrites the file as the collection changes. Save it to `assets/` and update the `bibliography:` line to match.
+
+If you already have a \`.bib\` file, import it into Zotero and export the collection as CSL JSON.
+
+JSON is unforgiving about punctuation, so export rather than hand-edit where possible.
+
+#### Entry format
+
+Each entry is an object in a single array. The `id` is the citation key.
 
 ``` json
 [
@@ -305,27 +317,12 @@ Copy `references_pakicetus.json`, rename it for your stock, and add entries.
 ]
 ```
 
-Use `"type": "article-journal"` for journal articles and `"type": "report"` for NOAA Technical Memoranda. Corporate authors use `"literal"` in place of `"family"` and `"given"`.:
+Use `"type": "article-journal"` for journal articles and `"type": "report"` for NOAA Technical Memoranda. Corporate authors take `"literal"` in place of `"family"` and `"given"`:
 
 ``` json
 "author": [
   {"literal": "National Marine Fisheries Service"}
 ]
-```
-
-Write titles in sentence case; the style applies its own capitalization.
-
-JSON is stricter than YAML about punctuation. Every key and string value takes double quotes, entries are separated by commas, and the last entry in an array or object must not be followed by a comma. JSON has no comment syntax, so notes to yourself have to live outside the file. If the render fails with a parse error, check the commas first.
-
-#### Building the file with Zotero
-
-The recommended workflow is Zotero with the Better BibTeX plugin, which exports CSL JSON directly and can keep the exported file synchronized as you add sources. In Zotero, right-click the collection, choose Export Collection, and select CSL JSON as the format. Check "Keep updated" to have Zotero rewrite the file whenever the collection changes.
-
-To convert an existing file, pandoc ships with Quarto and reads all three formats:
-
-``` bash
-pandoc references.bib -t csljson -o references_your-stock.json
-pandoc references.yaml -t csljson -o references_your-stock.json
 ```
 
 #### Citing in the text
@@ -336,18 +333,18 @@ pandoc references.yaml -t csljson -o references_your-stock.json
 | `@Wade_1998`                  | Wade (1998)                        |
 | `[@Wade_1998; @Martien_2019]` | (Wade, 1998; Martien et al., 2019) |
 
-#### The reference lise
+#### The reference list
 
-The reference list is generated at render time from the citations present in the document. Uncited entries are omitted. Keep the placement marker under the section heading, or the list is appended to the end of the file instead:
+The list is generated at render time from the citations present in the document, so uncited entries are omitted. Keep the placement marker under the section heading:
 
 ``` markdown
 ## REFERENCES CITED
-
+ 
 ::: {#refs}
 :::
 ```
 
-A citation key with no matching entry does not stop the render. It prints in place with a question mark, for example `(Wade_1998?)`, and pandoc issues a `citation not found` warning in the render log. Check both the log and the PDF.
+A citation key with no matching entry does not stop the render. It prints in place as `(Wade_1998?)` and pandoc logs a `citation not found` warning, so check the render log as well as the output.
 
 ------------------------------------------------------------------------
 

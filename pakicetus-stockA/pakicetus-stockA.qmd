@@ -132,9 +132,10 @@ additional guidance.
 
 ## POTENTIAL BIOLOGICAL REMOVAL
 
-This section of the SAR should provide a summary of the values used to
-calculate PBR and details its calculation. See Section 3.2 for
-additional guidance.
+This section of the SAR should provide a summary of the values used to calculate
+PBR and details its calculation [@Wade_1998]. See Section 3.2 for additional
+guidance. @Wade_1998 established the method, and the reporting conventions
+follow agency guidance [@NMFS_2023].
 
 ## ANNUAL HUMAN-CAUSED MORTALITY AND SERIOUS INJURY
 
@@ -161,3 +162,5 @@ stock. It should only be a summary of the issue and should reference
 publications. See Section 3.5 for additional guidance.
 
 ## REFERENCES CITED
+::: {#refs}
+:::
