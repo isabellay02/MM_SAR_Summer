@@ -47,7 +47,7 @@ format:
     keep-typ: false
     fig-width: 9
     fig-asp: 0.618
-    fig-dpi: 600
+    #fig-dpi: 600
 editor: 
   markdown: 
     wrap: 72
@@ -59,6 +59,7 @@ editor:
 
 library(dplyr)
 library(ggplot2)
+library(gt) #added by Isabella
 library(purrr)
 library(fs)
 
@@ -67,7 +68,7 @@ r_files <- fs::dir_ls(here::here("R"), glob = "*.R")
 purrr::map(r_files, source)
 
 # set the image device to ragg_png for better quality plots
-knitr::opts_chunk$set(dev = "ragg_png")
+knitr::opts_chunk$set(dev = "png")
 
 knitr::opts_chunk$set(
   warning = FALSE,
@@ -136,6 +137,31 @@ This section of the SAR should provide a summary of the values used to calculate
 PBR and details its calculation [@Wade_1998]. See Section 3.2 for additional
 guidance. @Wade_1998 established the method, and the reporting conventions
 follow agency guidance [@NMFS_2023].
+
+```{r}
+#| label: tbl-pbr
+#| tbl-cap: "Values used to calculate PBR for the Pakicetus Stock A."
+ 
+pbr_values <- tibble::tibble(
+  Parameter = c(
+    "Minimum population estimate (Nmin)",
+    "Maximum net productivity rate (Rmax)",
+    "Recovery factor (Fr)",
+    "Potential Biological Removal (PBR)"
+  ),
+  Value = c(2100, 0.04, 0.5, 42)
+)
+ 
+pbr_values |>
+  gt() |>
+  fmt(columns = "Value", fns = fmt_gamms_numbers) |>
+  cols_label(Parameter = "", Value = "") |>
+  tab_options(table.width = pct(70))
+```
+
+As shown in @tbl-pbr, the PBR for Pakicetus Stock A is calculated as
+Nmin \(\times\) 0.5 Rmax \(\times\) Fr ...
+
 
 ## ANNUAL HUMAN-CAUSED MORTALITY AND SERIOUS INJURY
 

@@ -110,7 +110,7 @@ The first render is slower while R caches packages. Output is written to \[OUTPU
 ## Repository tour (subject to update for updated template) {#repository-tour}
 
 | Path | What it is | Do you edit it? |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | `pakicetus-stockA/` | Example stock report | Delete once you've copied it |
 | `data/stocks/*.yml` | Per-stock inputs (abundance, M/SI, status) | **Yes** — this is where your numbers go |
 | `data/*.csv` | Generated summary tables | No — built by `scripts/` |
@@ -247,7 +247,7 @@ The best available abundance estimate is `r stocks$n_best`
 
 Inline R code, written as `` `r ... ` ``, retrieves values from the stock data file at render time. Use it for every quantity that also appears in the data file. When an estimate is revised, the text updates on the next render. Values typed directly into the prose are the most common source of disagreement between a SAR's narrative and its tables.
 
-### 5. Add figures and tables
+### 5. Add figures and tables (under active development)
 
 ```` markdown
 ```{r}
@@ -402,7 +402,7 @@ Published SARs must meet Section 508 requirements. Some of this is built in; som
 ## Troubleshooting {#troubleshooting}
 
 | Symptom | Likely cause | Fix (add details) |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | `quarto: command not found` | Quarto not on PATH | Reinstall; restart terminal |
 | `Format not found: nmfs-sar-pdf-typst` | Ran from wrong directory | Render from the repo root |
 | `could not find function "calc_pbr"` | `R/` not sourced | Check the setup chunk is present and unmodified |
