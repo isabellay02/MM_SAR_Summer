@@ -8,9 +8,9 @@ editor: markdown: wrap: 72 ---
 
 A Quarto repository template for authoring marine mammal Stock Assessment Reports under the Marine Mammal Protection Act, following the NMFS [*Guidelines for Assessing Marine Mammal Stocks* (GAMMS IV)](https://www.fisheries.noaa.gov/national/marine-mammal-protection/guidelines-assessing-marine-mammal-stocks).
 
-Generate a repository from this template, edit the Quarto source files for your stock, and render a formatted PDF. Document layout, NOAA Fisheries branding, citation formatting, and the calculations specified in Section 3.2 are preconfigured. Authors supply the assessment text and the stock data file; the template derives the reported values and handles formatting.
+Generate a institutional repository from this template, edit the Quarto source files for your stock, and render a formatted PDF. Document layout, NOAA Fisheries branding, citation formatting, and the calculations specified in Section 3.2 are preconfigured. Authors supply the assessment text and the stock data file; the template derives the reported values and handles formatting.
 
-> **New to Quarto, R, or Git?** Begin with the [instruction website](LINK), which covers software installation and basic version control. This README assumes a working installation and familiarity with standard Git operations.
+> **New to Quarto, R, or [Git](https://nmfs-opensci.github.io/GitHub-Guide/index.html)?** Begin with the [instruction website](LINK), which covers software installation and basic version control. This README assumes a working installation and familiarity with standard Git operations.
 
 ## Contents
 
@@ -73,7 +73,7 @@ On Windows, `R --version` may fail because R is not on the system PATH by defaul
 
 ------------------------------------------------------------------------
 
-## Quick start (set up private repo) {#quick-start}
+## Quick start (set up institutional private repo) {#quick-start}
 
 **1. Generate your repository.** Select **Use this template**, then **Create a new repository** at the top of this page.
 
@@ -110,7 +110,7 @@ The first render is slower while R caches packages. Output is written to \[OUTPU
 ## Repository tour (subject to update for updated template) {#repository-tour}
 
 | Path | What it is | Do you edit it? |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `pakicetus-stockA/` | Example stock report | Delete once you've copied it |
 | `data/stocks/*.yml` | Per-stock inputs (abundance, M/SI, status) | **Yes** — this is where your numbers go |
 | `data/*.csv` | Generated summary tables | No — built by `scripts/` |
@@ -247,19 +247,92 @@ The best available abundance estimate is `r stocks$n_best`
 
 Inline R code, written as `` `r ... ` ``, retrieves values from the stock data file at render time. Use it for every quantity that also appears in the data file. When an estimate is revised, the text updates on the next render. Values typed directly into the prose are the most common source of disagreement between a SAR's narrative and its tables.
 
-### 5. Add figures and tables (under active development)
+## 5. Add figures and tables
 
-```` markdown
+Figures and tables are added directly in each stock's `.qmd` file, using `ggplot2` for figures and `gt` for tables. Write the code for each figure or table in the section of the report it supports. For example, a range map belongs in "Stock Definition and Geographic Range"; a PBR summary table belongs in "Potential Biological Removal".
+
+Make sure `ggplot2` and `gt` are loaded in the report's setup chunk:
+
+```{r}
+#| label: setup
+#| include: false
+
+library(ggplot2)
+library(gt)
+```
+
+### Adding a figure
+
+1.  Create a code chunk where the figure belongs in the text.
+2.  Set chunk options: `label` (prefixed `fig-`), `fig-cap` (the printed caption), and `fig-alt` (a text description for screen readers).
+3.  Write the `ggplot2` code and let the plot print as the chunk's last line.
+
 ```{r}
 #| label: fig-range
 #| fig-cap: "Distribution of the Gulf of Maine/Bay of Fundy stock."
 #| fig-alt: "Map of the Gulf of Maine showing survey effort and sightings."
 
-plot_stock_range(stock = "harbor-porpoise-gom")
+ggplot(range_data, aes(x = lon, y = lat)) +
+  geom_point() +
+  theme_minimal()
 ```
 
-As shown in @fig-range, sightings concentrate ...
-````
+### Adding a pre-made figure (from a PNG)
+
+If a figure already exists as an image file, it can be inserted directly instead of generating it with `ggplot2`. Create a folder named `figures` at the root of the repository, place the image file and referecne it with `knitr::include_graphics()` :
+
+```{r}
+#| label: fig-range
+#| fig-cap: "Distribution of the Bottlenose Dolphin, Western North Atlantic stock."
+#| fig-alt: "Map of the western North Atlantic showing survey effort and sighting density for the Bottlenose Dolphin stock."
+#| out-width: "90%"
+#| fig-align: "center"
+
+knitr::include_graphics("../figures/BND_WNA_range_map.png")
+```
+
+A caption can also be built dynamically from variables computed earlier in the report, rather than typed as a fixed string. This is useful when a caption needs to update automatically each report cycle, for example a mortality time series whose end year and PBR value change every year:
+
+```{r}
+#| label: fig-mortality
+#| fig-cap: !expr paste0("Estimated annual human-caused mortality and serious injury, 1990-", year_max - 1, ". Red dashed line indicates PBR (", pbr_value, " animals per year).")
+#| fig-alt: "Time series plot of estimated human-caused mortality and serious injury, with a red dashed reference line showing PBR."
+#| out-width: "90%"
+#| fig-align: "center"
+
+knitr::include_graphics(paste0("../figures/CommonDolphin_WNA_mortality_1990-", year_max, ".png"))
+```
+
+The same requirements still apply: `label`, `fig-cap`, and `fig-alt` are all needed, since alt text describes what the image conveys, not how it was produced. A few notes on these examples:
+
+- Store pre-made images in the `figures` folder at the project root and reference them with a relative path (`../figures/...`), the same pattern already used for `../assets/` in the YAML front matter.
+
+- `!expr` tells Quarto to evaluate the R code that follows rather than treat it as a literal string, so the caption can be built from values such as `year_max` or `pbr_value` instead of being retyped each cycle. In-text citations, such as `@Wade_1998`, still resolve normally inside a caption written this way.
+
+- `out-width` and `fig-align` control the image's size and placement on the page, since `include_graphics()` does not have `ggplot2`'s own sizing options.
+
+### Adding a table
+
+Tables follow the same pattern, using a `tbl-` label and `tbl-cap` instead of `fig-cap`.
+
+<!-- accessibility for tables ? -->
+
+```{r}
+#| label: tbl-pbr
+#| tbl-cap: "Values used to calculate PBR."
+
+pbr_values |>
+  gt() |>
+  cols_label(Parameter = "", Value = "")
+```
+
+Add a page break after wide or tall tables so they don't run into the next section:
+
+### Referencing figures and tables in text
+
+Use `@fig-label` or `@tbl-label` to cross-reference a figure or table from your prose. Quarto turns this into a clickable link to the figure/table wherever it's referenced.
+
+> As shown in @fig-range, sightings concentrate ...
 
 `fig-cap` supplies the printed caption. `fig-alt` supplies the description read by screen readers and is required for Section 508 compliance. See [Accessibility](#accessibility).
 
@@ -380,7 +453,7 @@ Do this on a branch, not on `main`. (expand here)
 
 ## Accessibility {#accessibility}
 
-Published SARs must meet Section 508 requirements. Some of this is built in; some needs you.
+Published SARs must meet Section 508 requirements.
 
 **Built in:** document structure and heading hierarchy, tagged headings, reading order, citation formatting.
 
@@ -392,17 +465,14 @@ Published SARs must meet Section 508 requirements. Some of this is built in; som
 4.  **Don't encode meaning in color alone** — if strategic status is red, also label it "strategic."
 5.  **Meaningful link text** — not "click here."
 
-```{=html}
-<!-- TODO: confirm with Josh whether the Typst output has been tested
-     against a screen reader, and link to the NOAA 508 checklist. -->
-```
+<!-- Typst output test against a screen reader, and link to the NOAA 508 checklist. -->
 
 ------------------------------------------------------------------------
 
 ## Troubleshooting {#troubleshooting}
 
 | Symptom | Likely cause | Fix (add details) |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `quarto: command not found` | Quarto not on PATH | Reinstall; restart terminal |
 | `Format not found: nmfs-sar-pdf-typst` | Ran from wrong directory | Render from the repo root |
 | `could not find function "calc_pbr"` | `R/` not sourced | Check the setup chunk is present and unmodified |
@@ -421,7 +491,7 @@ Still stuck? Include your `quarto check` output and the full error when you [ope
 - **Bugs and template problems** — [Issues](../../issues)
 - **Questions about using it** — [Discussions](../../discussions)
 - **GAMMS and science questions** — your regional SAR editor
-- **General R/Quarto help** — NOAA Open Science help desk (resource link)
+- **General R/Quarto help** — NOAA Open Science help desk <!--resource link-->
 
 ------------------------------------------------------------------------
 
