@@ -6,11 +6,11 @@ editor: markdown: wrap: 72 ---
 
 <!-- Add badges once the workflow is live and the org path is settled: [![Render](https://github.com/ORG/REPO/actions/workflows/publish.yml/badge.svg)](https://github.com/ORG/REPO/actions/workflows/publish.yml)-->
 
-A Quarto repository template for authoring marine mammal Stock Assessment Reports under the Marine Mammal Protection Act, following the NMFS [*Guidelines for Assessing Marine Mammal Stocks* (GAMMS IV)](https://www.fisheries.noaa.gov/national/marine-mammal-protection/guidelines-assessing-marine-mammal-stocks).
+A Quarto template for authoring marine mammal Stock Assessment Reports under the Marine Mammal Protection Act, consistent with the NMFS [*Guidelines for Assessing Marine Mammal Stocks* (GAMMS IV)](https://www.fisheries.noaa.gov/national/marine-mammal-protection/guidelines-assessing-marine-mammal-stocks).
 
-Generate a institutional repository from this template, edit the Quarto source files for your stock, and render a formatted PDF. Document layout, NOAA Fisheries branding, citation formatting, and the calculations specified in Section 3.2 are preconfigured. Authors supply the assessment text and the stock data file; the template derives the reported values and handles formatting.
+Generate an institutional repository from this template, add your stock's assessment text and supporting data, and render a formatted PDF. Document layout, NOAA Fisheries branding, and citation formatting are preconfigured, and result tables follow GAMMS Section 3.2 formatting conventions.
 
-> **New to Quarto, R, or [Git](https://nmfs-opensci.github.io/GitHub-Guide/index.html)?** Begin with the [instruction website](LINK), which covers software installation and basic version control. This README assumes a working installation and familiarity with standard Git operations.
+> If you're new to GitHub, see the [NMFS GitHub Guide](https://nmfs-opensci.github.io/GitHub-Guide/index.html) for the basics of cloning, branching, and committing. Software installation (R, RStudio, Quarto) is covered in [Before you start](#before-you-start) below.
 
 ## Contents
 
@@ -33,29 +33,31 @@ Generate a institutional repository from this template, edit the Quarto source f
 
 Rendering the template produces a formatted SAR PDF that includes:
 
-- A NOAA Fisheries cover page and running headers populated by the YAML header
+- A NOAA Fisheries cover page and running headers, populated from the YAML header
 - Automatic line numbering for review drafts
 - Citations and a reference list generated from a CSL JSON reference file
-- Numbered figures and tables referenced by label (`@fig-`, `@tbl-`)
-- Values from N<sub>min</sub>, PBR calculated from the stock data file following GAMMS section 3.2 and strategic-status calculations derived from your data, not typed in by hand
-- An optional HTML preview for iteration while drafting
+- Numbered figures and tables, cross-referenced by label (`@fig-`, `@tbl-`)
+- Nmin, PBR, and strategic-status values calculated from the stock data file per GAMMS Section 3.2, rather than typed into the text by hand
+- An HTML preview for drafting
 
-The template includes two complete example stocks (`pakicetus-stockA`, `pakicetus-stockB`) using invented data. **Render both before making any changes**. A successful render confirms that the local environment is configured correctly and isolates any subsequent failure to the author's own edits.
+The template includes two example stocks (`pakicetus-stockA`, `pakicetus-stockB`) built on invented data. Render both examples first. A clean render confirms your environment is working, so you have a baseline to debug against.
 
 ------------------------------------------------------------------------
 
 ## Before you start {#before-you-start}
 
-Install the following before generating a repository from this template. Version minimums are enforced: PDF output is produced through Typst, which required Quarto 1.5 or latter.
+Install the following before generating a repository from this template. Version minimums are enforced: PDF output is produced through Typst, which requires Quarto 1.7 or later.
 
-| Tool    | Minimum    | Where                                        |
-|---------|------------|----------------------------------------------|
-| R       | 4.2        | <https://cran.r-project.org>                 |
-| RStudio | 2023.06+   | <https://posit.co/download/rstudio-desktop/> |
-| Quarto  | **1.7**    | <https://quarto.org/docs/get-started/>       |
-| Git     | any recent | <https://git-scm.com/downloads>              |
+| Tool    | Minimum    | Where                                  |
+|---------|------------|----------------------------------------|
+| R       | 4.2        | <https://cran.r-project.org>           |
+| RStudio | 2023.06+   | <https://posit.co/downloads>           |
+| Quarto  | **1.7**    | <https://quarto.org/docs/get-started/> |
+| Git     | any recent | <https://git-scm.com/install>          |
 
-You do **not** need a LaTeX installation. This template renders PDFs through [Typst](https://quarto.org/docs/output-formats/typst.html), a typesetting system distributed with Quarto, so no additional software is needed beyond the four items above. The report layout is defined in the `_extensions/` directory as a Quarto custom format. Authors do not need to modify Typst code to write a SAR.
+> **Versions are subject to change.** Quarto and Typst both release frequently, so treat the minimums above as a snapshot rather than a fixed floor, and make sure to verify with `quarto check` if a render behaves unexpectedly.
+
+You do **not** need a LaTeX installation. PDF output is produced through [Typst](https://quarto.org/docs/output-formats/typst.html), a modern typesetting system bundled with Quarto — no separate install required — that compiles significantly faster than LaTeX. The report layout itself is defined in the `_extensions/` directory as a Quarto custom Typst format; authors do not need to write or edit Typst code to produce a SAR.
 
 ### Verify your installation
 
@@ -73,7 +75,9 @@ On Windows, `R --version` may fail because R is not on the system PATH by defaul
 
 ------------------------------------------------------------------------
 
-## Quick start (set up institutional private repo) {#quick-start}
+## Quick start {#quick-start}
+
+> **Decision point.** This section assumes each stock gets its own repository, generated directly from this template via GitHub's **Use this template** button. Where those repositories are hosted (organization, visibility, naming convention), and whether template generation is even the intended workflow, is for NOAA Fisheries leadership to determine. The `ORG` placeholder in step 2 and the steps below should be finalized once that decision is made.
 
 **1. Generate your repository.** Select **Use this template**, then **Create a new repository** at the top of this page.
 
@@ -107,21 +111,24 @@ The first render is slower while R caches packages. Output is written to \[OUTPU
 
 ------------------------------------------------------------------------
 
-## Repository tour (subject to update for updated template) {#repository-tour}
+## Repository tour {#repository-tour}
+
+> **Subject to change.** This reflects the template's structure as of the current version as folders and files may be added, removed, or reorganized as the template develops.
 
 | Path | What it is | Do you edit it? |
-|------------------------|------------------------|------------------------|
-| `pakicetus-stockA/` | Example stock report | Delete once you've copied it |
-| `data/stocks/*.yml` | Per-stock inputs (abundance, M/SI, status) | **Yes** — this is where your numbers go |
-| `data/*.csv` | Generated summary tables | No — built by `scripts/` |
-| `scripts/` | Build and validation scripts | Rarely |
-| `R/` | Shared functions, auto-sourced by each report | Rarely |
-| `assets/` | SCSS theme, CSL citation style, fonts, `references.bib` | `references.bib` yes, rest no |
+|------------------|----------------------|--------------------------------|
+| `pakicetus-stockA/`, `pakicetus-stockB/` | Example stock reports | Delete once you've copied one |
+| `data/` | Placeholder folder for supporting data files, including a `spatial_data/` subfolder for maps and geographic data | Yes — add your stock's data files here |
+| `scripts/` | Build and validation scripts | Rarely — currently empty, reserved for future use |
+| `R/` | Shared functions, auto-sourced from every `.qmd`'s setup chunk | Rarely — the auto-source mechanism is live, though `R/` has no functions in it yet |
+| `assets/` | SCSS theme, CSL citation style, fonts, per-stock `references_<stock>.json` | `references_<stock>.json` yes, rest no |
 | `_extensions/noaa-afsc/nmfs-sar-pdf/` | Typst PDF format definition | **No** — see below |
 | `_quarto.yml` | Project config, render list, navigation | **Yes** — add your stock |
-| `.github/workflows/` | Automated rendering | Rarely |
+| `DESCRIPTION` | R dependency manifest, read by `pak::local_install_deps()` | Rarely — only if you add a new R package dependency |
+| `.github/workflows/` | Automated rendering (`publish_pakicetus.yml`) and secret scanning (`gitleaks_scan.yml`) | Rarely |
+| `LICENSE`, `LICENSE.md`, `CODE_OF_CONDUCT.md`, `DISCLAIMER.md`, `.gitignore`, `.Rbuildignore`, `*.Rproj` | Repository boilerplate and governance files | No |
 
-**On `_extensions/`:** this directory defines the NOAA SAR page layout. Editing it locally means your report drifts from every other region's, and your changes get overwritten on the next template update. If the layout is wrong for your stock, [open an issue](../../issues) instead.
+**On `_extensions/`:** this directory defines the NOAA SAR page layout. Editing it locally means your report drifts from every other region's, and your changes get overwritten on the next template update. If the layout is wrong for your stock, \[open an issue\] instead.
 
 ------------------------------------------------------------------------
 
@@ -315,7 +322,7 @@ The same requirements still apply: `label`, `fig-cap`, and `fig-alt` are all nee
 
 Tables follow the same pattern, using a `tbl-` label and `tbl-cap` instead of `fig-cap`.
 
-<!-- accessibility for tables ? -->
+<!-- details to be added regarding accessibility for tables if needed -->
 
 ```{r}
 #| label: tbl-pbr
@@ -453,36 +460,38 @@ Do this on a branch, not on `main`. (expand here)
 
 ## Accessibility {#accessibility}
 
-Published SARs must meet Section 508 requirements.
+Published SARs must meet [Section 508](https://www.section508.gov/test/documents/) (WCAG 2.0 A/AA).
 
-**Built in:** document structure and heading hierarchy, tagged headings, reading order, citation formatting.
+**Built in:** this repo builds its PDFs through Quarto's `nmfs-sar-pdf-typst` extension, which compiles to Typst. Typst tags PDF output automatically, and Quarto sends each figure's `fig-alt` chunk option straight to Typst as alt text. That means document structure, heading hierarchy, reading order, and citation formatting all happen without extra work. ([Quarto's Typst accessibility guide](https://quarto.org/docs/output-formats/typst.html))
 
-**Your responsibility:**
+*Note for template maintainers:* automatic tagging is not the same as full PDF/UA‑1 compliance. Tagging happens either way, but PDF/UA‑1 export is opt-in. Setting `pdf-standard: ua-1` under the `nmfs-sar-pdf-typst` format options turns on Typst's accessibility checker at compile time, which catches problems like missing titles, wrong heading order, and missing alt text (per [Typst's 0.14 release notes](https://typst.app/blog/2025/typst-0.14/)). Quarto passes this option straight to the Typst compiler; no extra tooling is needed. Set it once in `_quarto.yml` as a project-level default rather than repeating it in every `.qmd`, so new stock directories inherit it automatically.
 
-1.  **Alt text on every figure** — `fig-alt` in the chunk options. Describe what the figure *shows*, not that it is a figure. "Map of the Gulf of Maine with 47 sighting locations concentrated near Jeffreys Ledge," not "Map of study area." (example here)
-2.  Add figure (adding jpeg/png)
-3.  **Table headers** — use proper header rows so screen readers can announce them.
-4.  **Don't encode meaning in color alone** — if strategic status is red, also label it "strategic."
-5.  **Meaningful link text** — not "click here."
+**Your to-do list** (adapted from [ASAR's Accessibility Guide](https://nmfs-ost.github.io/asar/articles/accessibility_guide.html)):
 
-<!-- Typst output test against a screen reader, and link to the NOAA 508 checklist. -->
+1.  **Set `fig-alt` on every figure.** Good alt text covers four things: the chart type, the axis variables, the data range, and the relationship between variables, what the figure is actually showing. That last part matters most and gets skipped most often. See ASAR's [guidance and resources](https://nmfs-ost.github.io/asar/articles/accessibility_guide.html#guidance-and-resources) for worked examples and prompts by figure type (line graphs, Kobe plots, confidence intervals).
+2.  **Follow the general accessibility rules.** Give tables real header rows. Don't rely on color alone, if strategic status is shown in red, also label it "strategic" in the text. Write link text that describes the destination, not "click here."
+3.  **Test the rendered PDF with a screen reader** before publishing. Confirm the reading order makes sense and that alt text is actually read aloud. **Resources**
+
+- [NOAA Section 508 Accessibility Checklist](https://library.noaa.gov/ld.php?content_id=61618926): a step-by-step PDF checklist
+- [NOAA "Big 5" Quick Start](https://library.noaa.gov/Section508/QuickStart): bookmarks, alt text, reading order, document properties, tagging
+- [Section 508: Alternative Text](https://www.section508.gov/create/alternative-text/): what counts as good alt text
+- [Quarto Typst Accessibility Guide](https://quarto.org/docs/output-formats/typst.html): automatic tagging, `fig-alt` pass-through, the `pdf-standard` option
+- [Screen Readers Overview (AFB)](https://www.afb.org/blindness-and-low-vision/using-technology/assistive-technology-products/screen-readers): how screen readers read a document
 
 ------------------------------------------------------------------------
 
 ## Troubleshooting {#troubleshooting}
 
-| Symptom | Likely cause | Fix (add details) |
+| Symptom | Likely cause | Fix |
 |------------------------|------------------------|------------------------|
-| `quarto: command not found` | Quarto not on PATH | Reinstall; restart terminal |
-| `Format not found: nmfs-sar-pdf-typst` | Ran from wrong directory | Render from the repo root |
-| `could not find function "calc_pbr"` | `R/` not sourced | Check the setup chunk is present and unmodified |
-| `object 'stocks' not found` | Data not built | Run `scripts/build_stock_summary.R` |
-| Blank cover page fields | Empty YAML values | Fill every field in the header |
-| Figures missing from PDF | Wrong relative path | Use `here::here()`, not `../` |
-| Citations render as `[@key]` | Key not in `.bib` | Check spelling; keys are case-sensitive |
-| First render very slow | Downloading Typst | Expected once |
-
-Still stuck? Include your `quarto check` output and the full error when you [open an issue](../../issues).
+| `quarto: command not found` | Quarto is not on your PATH | Reinstall Quarto and restart your terminal. |
+| `Format not found: nmfs-sar-pdf-typst` | Quarto could not find `_extensions/` from where the command was run | Render from the repo root, or use your IDE's Render button, which does this automatically. |
+| `could not find function "your_function"` | A custom function in `R/` was not sourced, usually because the file was not saved there or was renamed | Confirm the setup chunk is present and unmodified; it sources every `.R` file in `R/` automatically. |
+| `object 'x' not found` | A script that builds that object has not been run yet | Run the relevant script in `scripts/` before rendering. |
+| Blank cover page fields | Empty values in the YAML header | Fill in every field at the top of the `.qmd`. |
+| Figures missing from the PDF | A relative path (like `../`) broke when Quarto changed the working directory | Use `here::here()` for file paths, the same pattern the setup chunk already uses for the `R/` folder. |
+| Citations render as `[@key]` | The key is not in your bibliography file, or is misspelled | Bibliography files here are CSL-JSON (for example, `references_pakicetus.json`), not `.bib`. Check spelling; keys are case-sensitive. |
+| First render is very slow | R is installing packages for the first time, including the large `rnaturalearthhires` dataset package | Expected once; later renders are faster. |
 
 ------------------------------------------------------------------------
 
