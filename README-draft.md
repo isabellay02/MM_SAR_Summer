@@ -116,7 +116,7 @@ The first render is slower while R caches packages. Output is written to \[OUTPU
 > **Subject to change.** This reflects the template's structure as of the current version as folders and files may be added, removed, or reorganized as the template develops.
 
 | Path | What it is | Do you edit it? |
-|------------------|----------------------|--------------------------------|
+|----|----|----|
 | `pakicetus-stockA/`, `pakicetus-stockB/` | Example stock reports | Delete once you've copied one |
 | `data/` | Placeholder folder for supporting data files, including a `spatial_data/` subfolder for maps and geographic data | Yes — add your stock's data files here |
 | `scripts/` | Build and validation scripts | Rarely — currently empty, reserved for future use |
@@ -483,7 +483,7 @@ Published SARs must meet [Section 508](https://www.section508.gov/test/documents
 ## Troubleshooting {#troubleshooting}
 
 | Symptom | Likely cause | Fix |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | `quarto: command not found` | Quarto is not on your PATH | Reinstall Quarto and restart your terminal. |
 | `Format not found: nmfs-sar-pdf-typst` | Quarto could not find `_extensions/` from where the command was run | Render from the repo root, or use your IDE's Render button, which does this automatically. |
 | `could not find function "your_function"` | A custom function in `R/` was not sourced, usually because the file was not saved there or was renamed | Confirm the setup chunk is present and unmodified; it sources every `.R` file in `R/` automatically. |
